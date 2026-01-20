@@ -1,5 +1,6 @@
 from crawler import crawl
 from form_parser import extract_forms
+from scanners.sqli import test_sqli
 
 if __name__ == "__main__":
     target = "http://testphp.vulnweb.com"
@@ -11,13 +12,24 @@ if __name__ == "__main__":
         forms = extract_forms(page)
         all_forms.extend(forms)
 
-    print("\nDiscovered forms:\n")
+    print("\nSQL Injection test results:\n")
 
     for form in all_forms:
-        print(f"Page: {form['page']}")
-        print(f"Action: {form['action']}")
-        print(f"Method: {form['method']}")
-        print("Inputs:")
-        for inp in form["inputs"]:
-            print(f"  - {inp['name']} ({inp['type']})")
-        print("-" * 40)
+        findings = test_sqli(form)
+        for finding in findings:
+            print(f"[!] {finding['type']}")
+            print(f"    URL: {finding['url']}")
+            print(f"    Parameter: {finding['parameter']}")
+            print(f"    Payload: {finding['payload']}")
+            print(f"    Evidence: {finding['evidence']}")
+            print("-" * 50)
+
+
+
+        #print(f"Page: {form['page']}")
+        #print(f"Action: {form['action']}")
+        #print(f"Method: {form['method']}")
+        #print("Inputs:")
+        #for inp in form["inputs"]:
+         #   print(f"  - {inp['name']} ({inp['type']})")
+        #print("-" * 40)
