@@ -1,6 +1,7 @@
 from crawler import crawl
 from form_parser import extract_forms
 from scanners.sqli import test_sqli
+from scanners.xss import test_xss
 
 if __name__ == "__main__":
     target = "http://testphp.vulnweb.com"
@@ -15,8 +16,9 @@ if __name__ == "__main__":
     print("\nSQL Injection test results:\n")
 
     for form in all_forms:
-        findings = test_sqli(form)
-        for finding in findings:
+        sqli_findings = test_sqli(form)
+        xss_findings = test_xss(form)
+        for finding in sqli_findings + xss_findings:
             print(f"[!] {finding['type']}")
             print(f"    URL: {finding['url']}")
             print(f"    Parameter: {finding['parameter']}")
