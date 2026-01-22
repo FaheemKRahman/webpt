@@ -3,6 +3,7 @@ from form_parser import extract_forms
 from scanners.sqli import test_sqli
 from scanners.xss import test_xss
 from scanners.csrf import test_csrf
+from severity import assign_severity 
 
 if __name__ == "__main__":
     target = "http://testphp.vulnweb.com"
@@ -24,11 +25,13 @@ if __name__ == "__main__":
 
 
         for finding in findings:
+            finding = assign_severity(finding)
             print(f"[!] {finding['type']}")
             print(f"    URL: {finding['url']}")
             print(f"    Parameter: {finding['parameter']}")
             print(f"    Payload: {finding['payload']}")
             print(f"    Evidence: {finding['evidence']}")
+            print(f"    Score: {finding['score']}")
             print("-" * 50)
 
 
