@@ -2,6 +2,7 @@ from crawler import crawl
 from form_parser import extract_forms
 from scanners.sqli import test_sqli
 from scanners.xss import test_xss
+from scanners.csrf import test_csrf
 
 if __name__ == "__main__":
     target = "http://testphp.vulnweb.com"
@@ -13,12 +14,16 @@ if __name__ == "__main__":
         forms = extract_forms(page)
         all_forms.extend(forms)
 
-    print("\nSQL Injection test results:\n")
+    print("\nVulnerability test results:\n")
 
     for form in all_forms:
-        sqli_findings = test_sqli(form)
-        xss_findings = test_xss(form)
-        for finding in sqli_findings + xss_findings:
+        findings = []
+        findings.extend(test_sqli(form))
+        findings.extend(test_xss(form))
+        findings.extend(test_csrf(form))
+
+
+        for finding in findings:
             print(f"[!] {finding['type']}")
             print(f"    URL: {finding['url']}")
             print(f"    Parameter: {finding['parameter']}")
