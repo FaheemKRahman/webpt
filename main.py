@@ -3,7 +3,8 @@ from form_parser import extract_forms
 from scanners.sqli import test_sqli
 from scanners.xss import test_xss
 from scanners.csrf import test_csrf
-from severity import assign_severity 
+from severity import assign_severity
+from report import generate_report
 
 if __name__ == "__main__":
     target = "http://testphp.vulnweb.com"
@@ -15,31 +16,24 @@ if __name__ == "__main__":
         forms = extract_forms(page)
         all_forms.extend(forms)
 
-    print("\nVulnerability test results:\n")
+    findings = []
+
+    print("\n[+] Running vulnerability tests...\n")
 
     for form in all_forms:
-        findings = []
         findings.extend(test_sqli(form))
         findings.extend(test_xss(form))
         findings.extend(test_csrf(form))
 
+    for finding in findings:
+        assign_severity(finding)
 
-        for finding in findings:
-            finding = assign_severity(finding)
-            print(f"[!] {finding['type']}")
-            print(f"    URL: {finding['url']}")
-            print(f"    Parameter: {finding['parameter']}")
-            print(f"    Payload: {finding['payload']}")
-            print(f"    Evidence: {finding['evidence']}")
-            print(f"    Score: {finding['score']}")
-            print("-" * 50)
+        print(f"[!] {finding['type']}")
+        print(f"    URL: {finding['url']}")
+        print(f"    Parameter: {finding['parameter']}")
+        print(f"    Payload: {finding['payload']}")
+        print(f"    Evidence: {finding['evidence']}")
+        print(f"    Severity: {finding['severity']} ({finding['score']})")
+        print("-" * 50)
 
-
-
-        #print(f"Page: {form['page']}")
-        #print(f"Action: {form['action']}")
-        #print(f"Method: {form['method']}")
-        #print("Inputs:")
-        #for inp in form["inputs"]:
-         #   print(f"  - {inp['name']} ({inp['type']})")
-        #print("-" * 40)
+    generate_report(target, findings)

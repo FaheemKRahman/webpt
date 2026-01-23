@@ -1,26 +1,17 @@
 def test_csrf(form):
     findings = []
 
-    if form["method"] != "post":
-        return findings
-    
-    inputs = form["inputs"]
-
-    token_found = False
-    
-    for inp in inputs:
-        name = (inp.get("name") or "").lower()
-        if "csrf" in name or "token" in name:
-            token_found = True
-            break
-
-    if not token_found:
+    if not form.get("csrf_token"):
         findings.append({
-            "type": "Possible CSRF",
+            "type": "CSRF",
             "url": form["action"],
             "parameter": "N/A",
             "payload": "N/A",
-            "evidence": "POST form witout apparent CSRF token"
+            "evidence": "No CSRF token detected",
+            "severity": None,
+            "score": None,
+            "impact": "Attacker can force victims to submit authenticated requests",
+            "remediation": "Implement anti-CSRF tokens and same-site cookies"
         })
 
     return findings
